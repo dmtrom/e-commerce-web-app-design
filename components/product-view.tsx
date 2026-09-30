@@ -1,8 +1,9 @@
 import Image from 'next/image'
-import { ArrowRight, RotateCcw, ShieldCheck, Truck } from 'lucide-react'
+import { ArrowRight, Plus, RotateCcw, ShieldCheck, Truck } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { PRODUCTS, formatPrice, type Product } from '@/lib/products'
+import { MAX_QUANTITY_PER_ITEM } from '@/lib/cart'
 import { cn } from '@/lib/utils'
 
 const PERKS = [
@@ -13,11 +14,15 @@ const PERKS = [
 
 export function ProductView({
   product,
+  inCart,
   onSelectProduct,
+  onAddToCart,
   onBuyNow,
 }: {
   product: Product
+  inCart: number
   onSelectProduct: (id: string) => void
+  onAddToCart: () => void
   onBuyNow: () => void
 }) {
   return (
@@ -94,10 +99,22 @@ export function ProductView({
         </fieldset>
 
         <div className="flex flex-col gap-3">
-          <Button size="lg" className="h-12 w-full text-base" onClick={onBuyNow}>
-            Buy Now — {formatPrice(product.priceInCents)}
-            <ArrowRight data-icon="inline-end" />
-          </Button>
+          <div className="grid grid-cols-5 gap-2">
+            <Button
+              size="lg"
+              variant="outline"
+              className="col-span-2 h-12 text-base"
+              onClick={onAddToCart}
+              disabled={inCart >= MAX_QUANTITY_PER_ITEM}
+            >
+              <Plus data-icon="inline-start" />
+              {inCart > 0 ? `In cart (${inCart})` : 'Add to cart'}
+            </Button>
+            <Button size="lg" className="col-span-3 h-12 text-base" onClick={onBuyNow}>
+              Buy Now — {formatPrice(product.priceInCents)}
+              <ArrowRight data-icon="inline-end" />
+            </Button>
+          </div>
           <ul className="flex flex-wrap justify-between gap-2 text-xs text-muted-foreground">
             {PERKS.map(({ icon: Icon, label }) => (
               <li key={label} className="flex items-center gap-1.5">
